@@ -165,7 +165,7 @@ This is not just a tool, but a complete AIGC creation ecosystem:
 
 ## 📂 My Other Open Source Projects
 
--   **[AI Highlight Clip](https://github.com/toki-plus/yanqu-highlight-clip)**: An AI-driven intelligent clipping tool that automatically analyzes, discovers, and clips multiple "highlight moment" short videos from long-form content, and generates viral titles.
+-   **[AI Highlight Clip](https://github.com/toki-plus/ai-highlight-clip)**: An AI-driven intelligent clipping tool that automatically analyzes, discovers, and clips multiple "highlight moment" short videos from long-form content, and generates viral titles.
 -   **[AI TTV Workflow](https://github.com/toki-plus/ai-ttv-workflow)**: An AI-powered Text-to-Video tool that automatically converts any script into a short video with voiceover, subtitles, and a cover image, supporting AI script extraction, re-creation, and translation.
 -   **[Video Mover](https://github.com/toki-plus/video-mover)**: A powerful, fully automated content creation pipeline. It automatically monitors and downloads videos from specified creators, performs deep, multi-dimensional video deduplication, uses an LLM to generate viral titles, and auto-publishes to different platforms.
 -   **[AB Video Deduplicator](https://github.com/toki-plus/AB-Video-Deduplicator)**: Utilizes an innovative "High-Framerate Frame-Mixing" technique to fundamentally alter a video's data fingerprint, designed to bypass originality detection and deduplication mechanisms on major short-video platforms.
@@ -182,3 +182,4 @@ If this project has been helpful to you, please consider giving it a ⭐!
 
 
 This project is open-sourced under the MIT License. See the [LICENSE](LICENSE) file for details.
+
