@@ -165,6 +165,7 @@ This is not just a tool, but a complete AIGC creation ecosystem:
 
 ## 📂 My Other Open Source Projects
 
+-   **[Auto USPS Tracker](https://github.com/toki-plus/auto-usps-tracker)**: An efficient USPS bulk package tracker for e-commerce sellers, featuring anti-blocking scraping and formatted Excel report generation.
 -   **[AI Mixed Cut](https://github.com/toki-plus/ai-mixed-cut)**: A groundbreaking AI content re-creation engine that deconstructs viral videos into a creative library and automatically generates new, original videos using a "Deconstruct-Reconstruct" model.
 -   **[AI Highlight Clip](https://github.com/toki-plus/ai-highlight-clip)**: An AI-driven intelligent clipping tool that automatically analyzes, discovers, and clips multiple "highlight moment" short videos from long-form content, and generates viral titles.
 -   **[AI TTV Workflow](https://github.com/toki-plus/ai-ttv-workflow)**: An AI-powered Text-to-Video tool that automatically converts any script into a short video with voiceover, subtitles, and a cover image, supporting AI script extraction, re-creation, and translation.
@@ -183,6 +184,7 @@ If this project has been helpful to you, please consider giving it a ⭐!
 
 
 This project is open-sourced under the MIT License. See the [LICENSE](LICENSE) file for details.
+
 
 
 
