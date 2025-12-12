@@ -182,9 +182,4 @@ If this project has been helpful to you, please consider giving it a ⭐!
 
 ## 📜 License
 
-
 This project is open-sourced under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-
-
-
