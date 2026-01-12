@@ -165,12 +165,13 @@ This is not just a tool, but a complete AIGC creation ecosystem:
 
 ## 📂 My Other Open Source Projects
 
+-   **[AI-Trader-For-MT4](https://github.com/toki-plus/ai-trader-for-mt4)**: A revolutionary open-source framework that transforms a Large Language Model (LLM) into an autonomous trading agent for the MetaTrader 4 (MT4) platform.
 -   **[Auto USPS Tracker](https://github.com/toki-plus/auto-usps-tracker)**: An efficient USPS bulk package tracker for e-commerce sellers, featuring anti-blocking scraping and formatted Excel report generation.
 -   **[AI Mixed Cut](https://github.com/toki-plus/ai-mixed-cut)**: A groundbreaking AI content re-creation engine that deconstructs viral videos into a creative library and automatically generates new, original videos using a "Deconstruct-Reconstruct" model.
 -   **[AI Highlight Clip](https://github.com/toki-plus/ai-highlight-clip)**: An AI-driven intelligent clipping tool that automatically analyzes, discovers, and clips multiple "highlight moment" short videos from long-form content, and generates viral titles.
 -   **[AI TTV Workflow](https://github.com/toki-plus/ai-ttv-workflow)**: An AI-powered Text-to-Video tool that automatically converts any script into a short video with voiceover, subtitles, and a cover image, supporting AI script extraction, re-creation, and translation.
--   **[Video Mover](https://github.com/toki-plus/video-mover)**: A powerful, fully automated content creation pipeline. It automatically monitors and downloads videos from specified creators, performs deep, multi-dimensional video deduplication, uses an LLM to generate viral titles, and auto-publishes to different platforms.
 -   **[AB Video Deduplicator](https://github.com/toki-plus/AB-Video-Deduplicator)**: Utilizes an innovative "High-Framerate Frame-Mixing" technique to fundamentally alter a video's data fingerprint, designed to bypass originality detection and deduplication mechanisms on major short-video platforms.
+-   **[Video Mover](https://github.com/toki-plus/video-mover)**: A powerful, fully automated content creation pipeline. It automatically monitors and downloads videos from specified creators, performs deep, multi-dimensional video deduplication, uses an LLM to generate viral titles, and auto-publishes to different platforms.
 
 ## 🤝 Contributing
 
@@ -183,3 +184,4 @@ If this project has been helpful to you, please consider giving it a ⭐!
 ## 📜 License
 
 This project is open-sourced under the MIT License. See the [LICENSE](LICENSE) file for details.
+
