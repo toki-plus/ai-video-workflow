@@ -161,22 +161,19 @@ class VolcengineAuth:
         payload_hash = self._hash_sha256(request_body_str)
         sorted_query_params = sorted(query_params.items())
         canonical_querystring = "&".join(f"{quote(k, safe='-_.~')}={quote(v, safe='-_.~')}" for k, v in sorted_query_params)
-        signed_headers_list = sorted(['host', 'content-type', 'x-date', 'x-content-sha256'])
+        signed_headers_list = sorted(['content-type', 'host', 'x-content-sha256', 'x-date'])
         signed_headers_str_for_auth = ';'.join(signed_headers_list)
-        canonical_headers_map = {
-            'host': host,
-            'content-type': content_type,
-            'x-date': current_date_utc,
-            'x-content-sha256': payload_hash
-        }
-        _canonical_headers_lines = [f"{k.lower()}:{str(canonical_headers_map[k]).strip()}" for k in signed_headers_list]
-        canonical_headers_for_req_no_trailing_newline = "\n".join(_canonical_headers_lines)
+        canonical_headers = (
+            f'content-type:{content_type}\n'
+            f'host:{host}\n'
+            f'x-content-sha256:{payload_hash}\n'
+            f'x-date:{current_date_utc}\n'
+        )
         canonical_request = (
             f'{http_method.upper()}\n'
             f'{canonical_uri}\n'
             f'{canonical_querystring}\n'
-            f'{canonical_headers_for_req_no_trailing_newline}\n'
-            f'\n'
+            f'{canonical_headers}\n'
             f'{signed_headers_str_for_auth}\n'
             f'{payload_hash}'
         )
@@ -244,12 +241,15 @@ class JimengI2VClient:
         except json.JSONDecodeError:
             raise ValueError(f"无法解析即梦图生视频服务器响应: {response.text}")
     def submit_video_generation_task(self, image_url: str, **kwargs: Any) -> str:
+        prompt_text = kwargs.get('prompt')
+        if not prompt_text:
+            raise ValueError("提交即梦图生视频任务失败：3.0 版本 'prompt' 参数为必填项，不能为空。")
         body_params = {
-            "req_key": "jimeng_vgfm_i2v_l20",
+            "req_key": "jimeng_i2v_first_v30_1080",
             "image_urls": [image_url],
-            "aspect_ratio": kwargs.get('aspect_ratio', '9:16'),
             "seed": kwargs.get('seed', -1),
-            "prompt": ""
+            "prompt": prompt_text,
+            "frames": kwargs.get('frames', 121)
         }
         response = self._make_request(action='CVSync2AsyncSubmitTask', body_params=body_params)
         task_id = response.get('data', {}).get('task_id')
@@ -257,7 +257,7 @@ class JimengI2VClient:
             raise ValueError(f"提交即梦图生视频任务失败，未能从响应中获取 task_id。响应: {response}")
         return task_id
     def query_task_status(self, task_id: str) -> Dict[str, Any]:
-        body_params = {"req_key": "jimeng_vgfm_i2v_l20", "task_id": task_id}
+        body_params = {"req_key": "jimeng_i2v_first_v30_1080", "task_id": task_id}
         return self._make_request(action='CVSync2AsyncGetResult', body_params=body_params)
 class JimengMusicClient:
     _HOST = "open.volcengineapi.com"
@@ -304,8 +304,8 @@ class JimengMusicClient:
             raise ValueError(f"无法解析即梦音乐服务器响应: {response.text}")
     def submit_music_generation_task(self, text: str, **kwargs: Any) -> str:
         body = {'Text': text, **kwargs}
-        if 'duration' in body and not 1 <= body['duration'] <= 60:
-            raise ValueError("音乐时长必须在1到60秒之间。")
+        if 'duration' in body and not 30 <= body['duration'] <= 120:
+            raise ValueError("音乐时长必须在30到120秒之间。")
         result = self._request(method="POST", action="GenBGMForTime", body=body)
         task_id = result.get('TaskID')
         if not task_id:
@@ -554,7 +554,7 @@ class PromptGenerationStrategy(ABC):
     def get_default_video_seed(self) -> int:
         return -1
     def get_default_music_prompt(self) -> str:
-        return "Genre: Pop, Mood: Playful, Theme: Fantasy, Instrument: Ukulele, Glockenspiel"
+        return "A serene and peaceful ambient music piece for a nature or forest theme, featuring soft piano, strings, and gentle nature sounds."
     def get_default_music_duration(self) -> int:
         return 30
 class BeautyPromptStrategy(PromptGenerationStrategy):
@@ -593,7 +593,7 @@ class BeautyPromptStrategy(PromptGenerationStrategy):
                 - 每个对象包含以下5个键:
                 - "scene_description": (string) 用中文简单描述场景。
                 - "image_prompt": (string) 用于LibLib图片生成的英文提示词。
-                - "music_prompt": (string) 用于即梦AI音乐生成的英文提示词，格式为 "Genre: ..., Mood: ..., Theme: ..., Instrument: ..."。
+                - "music_prompt": (string) 用于即梦AI音乐生成的英文提示词，请使用自然语言描述，包含曲风、情绪、场景、乐器等信息。
                 - "title": (string) 用于抖音发布的中文爆款标题。
                 - "tags": (string) 5个用井号分隔的中文爆款标签。
             注意事项:
@@ -608,7 +608,7 @@ class BeautyPromptStrategy(PromptGenerationStrategy):
         return [
             {"modelId": "10e5932187ad4b178280a104b3f8c4a6", "weight": 0.8}, # F.1超模好身材美女写真53号_极致逼真人像摄影
             {"modelId": "45df2bd176154f6abb66a63bd609e08a", "weight": 0.6}, # abel 胸（欧派）增大器_不影响其他lora脸型
-            {"modelId": "cc8f58889c134e9b84407215793034fd", "weight": 0.3}, # 自然柔软大扔 for Flux_SD1.5时代完美胸型再现
+            # {"modelId": "cc8f58889c134e9b84407215793034fd", "weight": 0.3}, # 自然柔软大扔 for Flux_SD1.5时代完美胸型再现
         ]
     def get_default_image_prompt(self) -> str:
         return "RAW photo, masterpiece, best quality, ultrarealistic, photorealistic, 8k, HDR, (photorealistic young Asian woman:1.3), beautiful detailed eyes, beautiful detailed lips, long flowing black hair, wearing a simple elegant white dress, standing in a sun-dappled forest, soft natural lighting, (depth of field:1.2), (bokeh:1.1), serene expression"
@@ -660,7 +660,7 @@ class LabubuPromptStrategy(PromptGenerationStrategy):
     def get_default_video_prompt(self) -> str:
         return ""
     def get_default_music_prompt(self) -> str:
-        return "Genre: Children's Lullaby, Pop, Mood: Playful, cheerful, Theme: Fantasy, sweets, clouds, Instrument: Ukulele, Glockenspiel, pizzicato strings"
+        return "A playful and cheerful pop music piece, like a children's lullaby, with a fantasy theme of sweets and clouds. Features ukulele, glockenspiel, and pizzicato strings."
 class Worker(QObject):
     log = pyqtSignal(str)
     error = pyqtSignal(str)
@@ -692,7 +692,7 @@ class Worker(QObject):
             user_content = user_content_template.format(styles='、'.join(selected_options))
             client = Ark(api_key=api_key)
             stream = client.chat.completions.create(
-                model="doubao-seed-1-6-thinking-250615",
+                model="doubao-seed-1-8-251228",
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_content},
@@ -1016,13 +1016,13 @@ class MainWindow(QMainWindow):
         av_layout = QFormLayout(av_widget)
         av_layout.setRowWrapPolicy(QFormLayout.WrapAllRows)
         av_layout.setVerticalSpacing(15)
-        self.vid_aspect_ratio_combo = QComboBox()
-        self.vid_aspect_ratio_combo.addItems(["9:16", "16:9", "4:3", "1:1", "3:4", "21:9", "9:21"])
+        self.vid_duration_combo = QComboBox()
+        self.vid_duration_combo.addItems(["5秒 (默认)", "10秒"])
         self.vid_seed_spin = NoWheelSpinBox()
         self.vid_seed_spin.setRange(-1, 2147483647)
         self.music_prompt_edit = PlainTextQTextEdit()
         self.music_prompt_edit.setFixedHeight(80)
-        av_layout.addRow("视频宽高比例:", self.vid_aspect_ratio_combo)
+        av_layout.addRow("视频时长:", self.vid_duration_combo)
         av_layout.addRow("视频随机种子:", self.vid_seed_spin)
         av_layout.addRow("音乐生成提示词:", self.music_prompt_edit)
         av_scroll = QScrollArea()
@@ -1275,7 +1275,7 @@ class MainWindow(QMainWindow):
         self._populate_prompt_theme_combo()
         self.log_message("请输入您的API密钥并开始创作。")
     def open_tutorial_link(self):
-        tutorial_url = "https://b23.tv/NUpEavM"
+        tutorial_url = "https://space.bilibili.com/497244096"
         QDesktopServices.openUrl(QUrl(tutorial_url))
         self.log_message(f"正在打开使用教程: {tutorial_url}")
     def start_main_generation_flow(self):
@@ -1803,10 +1803,15 @@ class MainWindow(QMainWindow):
             "additionalNetwork": additional_network if additional_network else None,
         }
     def get_video_generation_params(self) -> Dict[str, Any]:
+        duration_selection = self.vid_duration_combo.currentText()
+        if "10秒" in duration_selection:
+            frames_value = 241
+        else:
+            frames_value = 121
         return {
-            "prompt": "",
+            "prompt": self.img_prompt_edit.toPlainText().strip(),
             "seed": self.vid_seed_spin.value(),
-            "aspect_ratio": self.vid_aspect_ratio_combo.currentText(),
+            "frames": frames_value,
         }
     def get_music_generation_params(self) -> Dict[str, Any]:
         return {
@@ -1838,7 +1843,7 @@ class MainWindow(QMainWindow):
         self.img_steps_spin.setValue(strategy.get_default_image_steps())
         self.img_cfg_spin.setValue(strategy.get_default_image_cfg_scale())
         self.img_seed_spin.setValue(strategy.get_default_image_seed())
-        self.vid_aspect_ratio_combo.setCurrentText(strategy.get_default_video_aspect_ratio())
+        self.vid_duration_combo.setCurrentText("5秒 (默认)")
         self.vid_seed_spin.setValue(strategy.get_default_video_seed())
         self.music_prompt_edit.setText(strategy.get_default_music_prompt())
     def closeEvent(self, event):
@@ -1862,6 +1867,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
-
     sys.exit(app.exec_())
-
