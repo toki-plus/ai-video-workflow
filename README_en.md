@@ -151,7 +151,7 @@ This is not just a tool, but a complete AIGC creation ecosystem:
       <br />
       <sub><b>Personal WeChat</b></sub>
       <br />
-      <sub>ID: toki-plus (Please note "GitHub Customization")</sub>
+      <sub>ID: toki-plus</sub>
     </td>
     <td align="center">
       <img src="./assets/gzh.png" alt="Official Account QR Code" width="200"/>
