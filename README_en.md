@@ -1,198 +1,92 @@
-﻿# AI Video Workflow: A Fully Automated AI-Native Video Generation Pipeline
+# AI Video Workflow
 
-[简体中文](./README.md) | [English](./README_en.md)
+A workflow prototype for coordinating multiple generative-AI services in video production.
 
-[![GitHub stars](https://img.shields.io/github/stars/toki-plus/ai-video-workflow?style=social)](https://github.com/toki-plus/ai-video-workflow/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/toki-plus/ai-video-workflow?style=social)](https://github.com/toki-plus/ai-video-workflow/network/members)
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/toki-plus/ai-video-workflow/pulls)
+The project connects prompt generation, text-to-image, image-to-video, text-to-music, and media composition in one desktop application. Its focus is cross-provider orchestration, state management, and human review points.
 
-**`AI Video Workflow` is a free, open-source desktop application that chains multiple top-tier AI models (Text-to-Image, Image-to-Video, Text-to-Music) into a fully automated, AI-native video creation pipeline.**
+## Context
 
-Do you want to create eye-catching AI short videos but are troubled by tedious platform switching, complex parameter tuning, and a lack of creative inspiration? This project aims to simplify the entire process of AI video creation into just a few clicks, allowing anyone to easily generate short videos with unique visual styles and custom soundtracks.
+Generative-video workflows often depend on several models and vendors: one interprets the brief, another creates images, and others generate video or music. Moving prompts and files manually between services increases waiting time, version-management overhead, and retry effort.
 
-<p align="center">
-  <a href="https://www.bilibili.com" target="_blank">
-    <img src="" alt="Click to watch the demo video on Bilibili (Coming Soon)" width="800"/>
-  </a>
-  <br>
-  <em>(Click the image to watch the HD demo video on Bilibili)</em>
-</p>
+AI Video Workflow organizes the steps into a visual pipeline and allows users to review and select outputs at key stages.
 
----
+## Capabilities
 
-## ✨ Core Features
+- Generate and refine visual prompts with an LLM
+- Submit text-to-image jobs to LibLibAI
+- Use Volcengine-related services for image-to-video and music generation
+- Poll asynchronous task status and collect output files
+- Manage candidate image, video, and audio versions
+- Compose generated video and music into a final output
+- Configure parameters, preview results, and restart workflows in a PyQt5 interface
 
-This is not just a tool, but a complete AIGC creation ecosystem:
+## Workflow
 
--   **🤖 Fully Automated AI Creation Pipeline**:
-    -   **Text-to-Image**: Integrates with the **LibLibAI** platform, supporting a rich set of Checkpoints, LoRA models, and parameters to turn your ideas into stunning images.
-    -   **Image-to-Video**: Calls the **Jimeng I2V** model from Volcengine to bring static images to life, generating smooth and natural dynamic videos.
-    -   **Text-to-Music**: Connects to the **Jimeng Music** model from Volcengine, allowing you to generate unique background music simply by describing its style, mood, or instruments.
-    -   **Automatic Merging**: Uses the powerful **FFmpeg** engine to seamlessly merge the generated video with the background music into a final polished product.
+```text
+Creative brief
+    -> Prompt generation
+    -> Human review
+    -> Text-to-image
+    -> Image selection
+    -> Image-to-video
+    -> Music generation
+    -> Media composition
+    -> Final review
+```
 
--   **💡 AI-Powered Inspiration Engine**:
-    -   Features a built-in prompt generator powered by the **Doubao (Doubao) Large Language Model**.
-    -   Offers various preset themes like "Beauty" and "Labubu." Simply check the styles you want (e.g., "Beach," "Gym," or "Candy," "Magic"), and it will generate a full set of professional prompts for images and music, along with viral titles and tags.
+## Technical Design
 
--   **🎨 Intuitive Graphical User Interface (GUI)**:
-    -   **Three-Step Workflow**: Clearly divides the creation process into three stages: "Text-to-Image → Image-to-Video → Text-to-Music & Merge," with the progress and results of each step visible at a glance.
-    -   **Centralized Parameter Management**: Configure all AI model parameters in a unified interface, eliminating the need to switch between multiple websites or applications.
-    -   **Real-time Media Preview**: Generated images and videos are displayed and played directly in the interface, allowing for immediate feedback.
-    -   **History & Navigation**: Easily switch between multiple generated images to select the best one for the next step.
+- `LiblibClient`: text-to-image submission and status polling
+- `JimengI2VClient`: image-to-video provider adapter
+- `JimengMusicClient`: music-generation provider adapter
+- `AIGenerationPipeline`: cross-service orchestration
+- `PromptGenerationStrategy`: extensible prompt strategies
+- `MainWindow`: parameter, preview, and task-state management
 
-## 📸 Screenshots
+Core technologies: Python, PyQt5, the Volcengine SDK, LibLibAI APIs, and FFmpeg/media-processing libraries.
 
-<p align="center">
-  <img src="./assets/cover_software01.png" alt="Software Main Interface" width="800"/>
-  <br>
-  <em>Software Main Interface: Prompt Generation section.</em>
-</p>
-<p align="center">
-  <img src="./assets/cover_software02.png" alt="Software Main Interface" width="800"/>
-  <br>
-  <em>Software Main Interface: Image Parameters section.</em>
-</p>
+## Quick Start
 
-<table align="center">
-  <tr>
-    <td align="center" valign="top">
-      <img src="./assets/cover_demo_picture.png" alt="Generation Example: Generated Image" width="390"/>
-      <br />
-      <em>Generation Example: Generated Image.</em>
-    </td>
-    <td align="center" valign="top">
-      <img src="./assets/cover_demo_video.gif" alt="Generation Example: Final Video" width="390"/>
-      <br />
-      <em>Generation Example: Final Video.</em>
-    </td>
-  </tr>
-</table>
+### Requirements
 
-## 🚀 Quick Start
+- Python 3.8+
+- FFmpeg available on `PATH`
+- Valid credentials for the configured model providers
 
-### System Requirements
+```bash
+git clone https://github.com/toki-plus/ai-video-workflow.git
+cd ai-video-workflow
+python -m venv venv
+```
 
-1.  **Python**: 3.8 or higher.
-2.  **FFmpeg**: **Must** be installed and added to the system's PATH environment variable.
-    -   Visit the [FFmpeg official website](https://ffmpeg.org/download.html) for installation instructions.
-    -   To check, open a terminal/command prompt and type `ffmpeg -version`.
-3.  **API Keys**:
-    -   **Doubao API Key**: For prompt generation.
-    -   **LibLibAI Access Key & Secret Key**: For Text-to-Image.
-    -   **Volcengine (Jimeng) Access Key & Secret Key**: For Image-to-Video and Text-to-Music.
+After activating the virtual environment:
 
-### Installation & Launch
+```bash
+pip install -r requirements.txt
+python ai-video-workflow.py
+```
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/toki-plus/ai-video-workflow.git
-    cd ai-video-workflow
-    ```
+Environment variables are recommended for credentials:
 
-2.  **Create and activate a virtual environment (recommended):**
-    ```bash
-    python -m venv venv
-    # On Windows
-    venv\Scripts\activate
-    # On macOS/Linux
-    source venv/bin/activate
-    ```
+```text
+DOUBAO_API_KEY
+LIBLIB_AK
+LIBLIB_SK
+JIMENG_AK
+JIMENG_SK
+```
 
-3.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+## Limitations and Responsible Use
 
-4.  **Configure API Keys:**
-    -   **Highly recommended:** Configure keys via system environment variables, which the application will read automatically:
-        - `DOUBAO_API_KEY`
-        - `LIBLIB_AK`, `LIBLIB_SK`
-        - `JIMENG_AK`, `JIMENG_SK`
-    -   Alternatively, you can manually enter them in the "API Keys" tab after launching the software.
+- Provider APIs, quotas, and model behavior may change.
+- Generated outputs require human review and must comply with copyright and provider terms.
+- API credentials must remain in secure local configuration.
+- The current implementation is a workflow prototype and does not yet include comprehensive automated tests or CI.
 
-5.  **Run the application:**
-    ```bash
-    python ai_video_workflow.py
-    ```
+## What This Project Demonstrates
 
-## 📖 Usage Guide
+The core value is not a single generated asset. It is the abstraction of multiple model providers, asynchronous job orchestration, failure boundaries, and human approval points.
 
-1.  **Step 1: Configuration & Preparation**
-    -   Launch the app, go to the "API Keys" tab on the left, ensure all keys are entered correctly, and click "Save Current Parameters."
-    -   Switch to the "Prompt Generation" tab, select a theme (e.g., "Beauty"), check a few scenes, and click "Generate Prompts."
-    -   In the table below, select your favorite row and click "Apply Prompts from Selected Row."
+## License
 
-2.  **Step 2: Text-to-Image**
-    -   Parameters will be auto-filled in the "Image" and "Audio/Video" tabs; you can also modify them manually.
-    -   In the right-hand workflow panel, click "Generate Image." The generated image will appear in the preview area.
-    -   You can generate multiple images and use the "Previous"/"Next" buttons to choose the best one.
-
-3.  **Step 3: Image-to-Video**
-    -   After selecting your desired image, click "Generate Video." The app will send the image to the AI model for processing.
-    -   Once complete, the silent video will loop automatically in the preview area.
-
-4.  **Step 4: Text-to-Music & Merge**
-    -   Click "Merge Final Video." The app will use the music prompt from the "Audio/Video" tab to generate a soundtrack and merge it with the video.
-    -   Upon completion, the final video with audio will play in the preview area and be saved to the `output` folder.
-
-5.  **Done!**
-    -   Click "Reset All" to clear the current state and start a new creation.
-
----
-
-<p align="center">
-  <strong>For technical discussions and updates, please add:</strong>
-</p>
-<table align="center">
-  <tr>
-    <td align="center">
-      <img src="./assets/wechat.png" alt="WeChat QR Code" width="200"/>
-      <br />
-      <sub><b>Personal WeChat</b></sub>
-      <br />
-      <sub>WeChat ID: toki-plus</sub>
-      <br />
-      <sub>(Please include your purpose when adding me)</sub>
-    </td>
-    <td align="center">
-      <img src="./assets/gzh.png" alt="Official Account QR Code" width="200"/>
-      <br />
-      <sub><b>Official Account</b></sub>
-      <br />
-      <sub>Get the latest tech shares and project updates</sub>
-    </td>
-  </tr>
-</table>
-
-## 📂 My Other Open Source Projects
-
--   **[AI-Trader-For-MT5](https://github.com/toki-plus/ai-trader-for-mt5)**: An AI trading assistant and EA engineering framework for MetaTrader 5, combining MQL5, Python, MCP-style tool services, risk modules, and private custom development.
--   **[Netease Downloader](https://github.com/toki-plus/netease-downloader)**: An elegant, feature-rich desktop application for downloading high-quality and lossless music from Netease Cloud Music, with support for playlists, albums, QR login, and automatic metadata tagging.
--   **[AI-Trader-For-MT4](https://github.com/toki-plus/ai-trader-for-mt4)**: An LLM-driven autonomous MT4 trading robot framework that turns large language models into AI trading agents capable of sensing, reasoning, and acting on MetaTrader 4.
--   **[Auto USPS Tracker](https://github.com/toki-plus/auto-usps-tracker)**: A batch USPS logistics tracker designed for cross-border e-commerce sellers, supporting batch tracking and Excel report generation.
--   **[AI Mixed Cut](https://github.com/toki-plus/ai-mixed-cut)**: An AI content re-creation and mixed-cut tool that deconstructs existing videos into creative assets and automatically generates new short-form videos.
--   **[AI Highlight Clip](https://github.com/toki-plus/ai-highlight-clip)**: An AI-powered intelligent clipping tool that automatically analyzes long videos and extracts highlight clips for short-form content distribution.
--   **[AI TTV Workflow](https://github.com/toki-plus/ai-ttv-workflow)**: An AI-powered text-to-video workflow that turns scripts into short videos with voiceover, subtitles, and cover images.
--   **[AB Video Deduplicator](https://github.com/toki-plus/AB-Video-Deduplicator)**: A video deduplication and fingerprint-reconstruction tool that changes video data characteristics through high-frame-rate frame sampling and blending.
--   **[Video Mover](https://github.com/toki-plus/video-mover)**: An automated content creation pipeline for video monitoring, downloading, multi-dimensional processing, AI title generation, and multi-platform publishing.
-
-
-## 🤝 Contributing
-
-Contributions of any kind are welcome! If you have ideas for new features, found a bug, or have any suggestions for improvement, please:
--   Submit an [Issue](https://github.com/toki-plus/ai-video-workflow/issues) to start a discussion.
--   Fork this repository and submit a [Pull Request](https://github.com/toki-plus/ai-video-workflow/pulls).
-
-If this project has been helpful to you, please consider giving it a ⭐!
-
-## 📜 License
-
-This project is open-sourced under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-
-
-
-
-
-
+See [LICENSE](./LICENSE).

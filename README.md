@@ -1,194 +1,92 @@
-﻿# AI Video Workflow: 全自动 AI 原生视频生成工作流
+# AI Video Workflow
 
-[简体中文](./README.md) | [English](./README_en.md)
+用于验证多模型协同的视频生成工作流原型。
 
-[![GitHub stars](https://img.shields.io/github/stars/toki-plus/ai-video-workflow?style=social)](https://github.com/toki-plus/ai-video-workflow/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/toki-plus/ai-video-workflow?style=social)](https://github.com/toki-plus/ai-video-workflow/network/members)
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/toki-plus/ai-video-workflow/pulls)
+项目将提示词生成、文生图、图生视频、文生音乐和媒体合成串联在一个桌面应用中，重点探索不同 AI 服务之间的任务编排、状态管理与人工选择点。
 
-**`AI Video Workflow` 是一款免费、开源的桌面应用程序，它将多个顶尖的AI模型（文生图、图生视频、文生音乐）串联成一个全自动的AI原生视频创作流水线。**
+## 项目背景
 
-你是否想创作引人注目的AI短视频，却被繁琐的平台切换、复杂的参数调整和枯竭的创作灵感所困扰？本项目旨在将AI视频创作的整个过程简化为几次点击，让任何人都能轻松生成具有独特视觉风格和定制化配乐的短视频。
+生成式视频通常依赖多个模型和供应商：一个模型负责理解创意，一个模型生成图片，另一个模型生成视频或音乐。手工在多个平台之间传递提示词和文件，会增加等待、版本管理和失败重试成本。
 
-<p align="center">
-  <a href="https://www.bilibili.com" target="_blank">
-    <img src="" alt="点击观看B站演示视频（暂未录制）" width="800"/>
-  </a>
-  <br>
-  <em>(点击图片跳转到 B 站观看高清演示视频)</em>
-</p>
+AI Video Workflow 将这些步骤组织为一条可视化流水线，并允许用户在关键阶段预览和选择结果。
 
----
+## 主要能力
 
-## ✨ 核心功能
+- 使用大模型生成和调整视觉提示词
+- 调用 LibLibAI 完成文生图任务
+- 调用火山引擎相关服务完成图生视频与音乐生成
+- 轮询异步任务状态并处理结果文件
+- 管理候选图片、视频和音频版本
+- 将生成的视频和音乐合成为最终输出
+- 在 PyQt5 界面中配置参数、预览结果和重启流程
 
-这不仅是一个工具，更是一个完整的 AIGC 创作生态系统：
+## 工作流
 
--   **🤖 全自动AI创作流水线**:
-    -   **文生图 (Text-to-Image)**: 对接 **LibLibAI** 平台，支持丰富的 Checkpoint、LoRA 模型和参数，将您的想法变为精美图像。
-    -   **图生视频 (Image-to-Video)**: 调用火山引擎 **即梦（Jimeng）I2V** 模型，为静态图片赋予生命，生成平滑自然的动态视频。
-    -   **文生音乐 (Text-to-Music)**: 接入火山引擎 **即梦（Jimeng）音乐** 模型，通过文本描述（如风格、情绪、乐器）即可生成独一无二的背景音乐。
-    -   **自动合成 (Automatic Merging)**: 使用强大的 **FFmpeg** 引擎，将生成的视频画面与背景音乐无缝合成为最终的成品视频。
+```text
+Creative brief
+    -> Prompt generation
+    -> Human review
+    -> Text-to-image
+    -> Image selection
+    -> Image-to-video
+    -> Music generation
+    -> Media composition
+    -> Final review
+```
 
--   **💡 AI驱动的灵感引擎**:
-    -   内置基于 **豆包（Doubao）大模型** 的提示词生成器。
-    -   提供“美女”、“Labubu”等多种预设主题，只需勾选想要的风格（如“沙滩”、“健身房”或“糖果系”、“魔法系”），即可一键生成全套专业的图片、音乐提示词和爆款标题、标签。
+## 技术设计
 
--   **🎨 直观的图形化界面 (GUI)**:
-    -   **三步式工作流**: 清晰地将创作过程分为“文生图 → 图生视频 → 文生音乐与合成”三个阶段，每一步的进展和结果都一目了然。
-    -   **集中式参数管理**: 在统一的界面中配置所有AI模型的参数，无需在多个网页或应用间切换。
-    -   **实时媒体预览**: 生成的图片和视频会直接在界面中展示和播放，方便您即时评估效果。
-    -   **历史记录与导航**: 支持在多张生成的图片之间轻松切换，方便您选择最满意的一张进入下一步。
+- `LiblibClient`：文生图任务提交与状态查询
+- `JimengI2VClient`：图生视频服务适配
+- `JimengMusicClient`：音乐生成服务适配
+- `AIGenerationPipeline`：跨服务工作流编排
+- `PromptGenerationStrategy`：可扩展提示词策略
+- `MainWindow`：参数、预览和任务状态管理
 
-## 📸 软件截图
+主要技术：Python、PyQt5、Volcengine SDK、LibLibAI API、FFmpeg/媒体处理库。
 
-<p align="center">
-  <img src="./assets/cover_software01.png" alt="软件主界面" width="800"/>
-  <br>
-  <em>软件主界面：提示词生成部分。</em>
-</p>
-<p align="center">
-  <img src="./assets/cover_software02.png" alt="软件主界面" width="800"/>
-  <br>
-  <em>软件主界面：图像参数部分。</em>
-</p>
+## 快速开始
 
-<table align="center">
-  <tr>
-    <td align="center" valign="top">
-      <img src="./assets/cover_demo_picture.png" alt="生成示例：生成图像" width="390"/>
-      <br />
-      <em>生成示例：生成图像。</em>
-    </td>
-    <td align="center" valign="top">
-      <img src="./assets/cover_demo_video.gif" alt="生成示例：最终视频" width="390"/>
-      <br />
-      <em>生成示例：最终视频。</em>
-    </td>
-  </tr>
-</table>
+### 环境要求
 
-## 🚀 快速开始
+- Python 3.8+
+- FFmpeg（需加入 `PATH`）
+- 对应模型服务的有效 API 凭据
 
-### 系统要求
+```bash
+git clone https://github.com/toki-plus/ai-video-workflow.git
+cd ai-video-workflow
+python -m venv venv
+```
 
-1.  **Python**: 3.8 或更高版本。
-2.  **FFmpeg**: **必须**安装 FFmpeg 并将其添加到系统环境变量中。
-    -   请访问 [FFmpeg 官网](https://ffmpeg.org/download.html) 查看安装教程。
-    -   检查是否安装成功：打开终端或命令提示符，输入 `ffmpeg -version`。
-3.  **API Keys**:
-    -   **豆包（Doubao） API Key**: 用于提示词生成。
-    -   **LibLibAI Access Key & Secret Key**: 用于文生图。
-    -   **火山引擎（即梦）Access Key & Secret Key**: 用于图生视频和文生音乐。
+激活虚拟环境后：
 
-### 安装与启动
+```bash
+pip install -r requirements.txt
+python ai-video-workflow.py
+```
 
-1.  **克隆本仓库：**
-    ```bash
-    git clone https://github.com/toki-plus/ai-video-workflow.git
-    cd ai-video-workflow
-    ```
+建议通过环境变量提供凭据：
 
-2.  **创建并激活虚拟环境 (推荐)：**
-    ```bash
-    python -m venv venv
-    # Windows 系统
-    venv\Scripts\activate
-    # macOS/Linux 系统
-    source venv/bin/activate
-    ```
+```text
+DOUBAO_API_KEY
+LIBLIB_AK
+LIBLIB_SK
+JIMENG_AK
+JIMENG_SK
+```
 
-3.  **安装依赖库：**
-    ```bash
-    pip install -r requirements.txt
-    ```
+## 使用边界
 
-4.  **配置 API Keys:**
-    -   **强烈建议**通过设置系统环境变量来配置密钥，程序会自动读取：
-        - `DOUBAO_API_KEY`
-        - `LIBLIB_AK`, `LIBLIB_SK`
-        - `JIMENG_AK`, `JIMENG_SK`
-    -   或者，您也可以在软件启动后，在 "API 密钥" 标签页中手动输入。
+- 不同供应商的接口、配额和模型行为可能发生变化。
+- 生成结果应经过人工审核，并遵守素材版权与模型服务条款。
+- API 凭据只能保存在安全的本地环境中。
+- 当前实现以原型验证为主，尚未建立完整的自动化测试与 CI。
 
-5.  **运行程序：**
-    ```bash
-    python ai_video_workflow.py
-    ```
+## 项目价值
 
-## 📖 使用指南
+本项目展示的核心不是单次生成效果，而是多模型服务的抽象、异步任务编排、失败边界和人工确认点设计。
 
-1.  **第一步：配置与准备**
-    -   启动软件，在左侧的 "API 密钥" 标签页中确认所有密钥已填写正确，点击“保存当前参数”应用。
-    -   切换到 "提示词生成" 标签页，选择一个您感兴趣的主题（如“美女”），勾选几个场景，然后点击“生成提示词”。
-    -   在下方生成的表格中，选择最喜欢的一行，点击“应用选中行提示词”。
+## License
 
-2.  **第二步：文生图**
-    -   参数会自动填充到“图像参数”和“音视频参数”标签页，您也可以手动修改。
-    -   在右侧工作流面板，点击“开始生成图片”。等待片刻，生成的图片将显示在预览区。
-    -   您可以多次生成，并通过“上一张”/“下一张”按钮选择最满意的图片。
-
-3.  **第三步：图生视频**
-    -   确认已选中满意的图片后，点击“生成视频”。程序会将该图片发送到AI模型进行处理。
-    -   处理完成后，生成的无声视频会自动在预览区循环播放。
-
-4.  **第四步：文生音乐与合成**
-    -   点击“合成最终视频”。程序将使用“音视频参数”中的音乐提示词生成配乐，并与视频合并。
-    -   任务完成后，最终的带配乐视频将在预览区播放，并保存在 `output` 文件夹中。
-
-5.  **完成！**
-    -   点击“全部重来”可以清空当前状态，开始一次全新的创作。
-
----
-
-<p align="center">
-  <strong>技术交流，请添加：</strong>
-</p>
-<table align="center">
-  <tr>
-    <td align="center">
-      <img src="./assets/wechat.png" alt="微信二维码" width="200"/>
-      <br />
-      <sub><b>个人微信</b></sub>
-      <br />
-      <sub>微信号: toki-plus</sub>
-      <br />
-      <sub>（请备注来意，否则不通过）</sub>
-    </td>
-    <td align="center">
-      <img src="./assets/gzh.png" alt="公众号二维码" width="200"/>
-      <br />
-      <sub><b>公众号</b></sub>
-      <br />
-      <sub>获取最新技术分享与项目更新</sub>
-    </td>
-  </tr>
-</table>
-
-## 📂 我的其他开源项目
-
--   **[AI-Trader-For-MT5](https://github.com/toki-plus/ai-trader-for-mt5)**: 面向 MetaTrader 5 的 AI 交易助手与 EA 工程化框架，支持 MQL5、Python、MCP 工具服务、风控模块和私有化定制开发。
--   **[Netease Downloader](https://github.com/toki-plus/netease-downloader)**: 一款优雅、功能丰富的网易云音乐下载器，支持无损/高品质音质、歌单/专辑批量下载、扫码登录和自动写入ID3元数据。
--   **[AI-Trader-For-MT4](https://github.com/toki-plus/ai-trader-for-mt4)**: LLM驱动的自主型MT4交易机器人框架，将大语言模型转变为能够在 MetaTrader 4 平台上进行“感知-思考-行动”的 AI 交易代理。
--   **[Auto USPS Tracker](https://github.com/toki-plus/auto-usps-tracker)**: 专为跨境电商卖家设计的 USPS 批量物流追踪器，支持批量查询并生成 Excel 报告。
--   **[AI Mixed Cut](https://github.com/toki-plus/ai-mixed-cut)**: AI 内容重构与混剪工具，通过“解构-重构”模式将现有视频解析为创作素材，并自动生成新的短视频内容。
--   **[AI Highlight Clip](https://github.com/toki-plus/ai-highlight-clip)**: AI 驱动的智能剪辑工具，自动从长视频中分析并提取高光片段，生成适合分发的短视频内容。
--   **[AI TTV Workflow](https://github.com/toki-plus/ai-ttv-workflow)**: AI 驱动的文本转视频工具，自动将文案转化为带配音、字幕和封面的短视频。
--   **[AB Video Deduplicator](https://github.com/toki-plus/AB-Video-Deduplicator)**: 视频去重与指纹重构工具，通过高帧率抽帧混合等方式改变视频数据特征。
--   **[Video Mover](https://github.com/toki-plus/video-mover)**: 全自动内容创作流水线，支持视频监听下载、多维度处理、AI 标题生成和多平台发布。
-
-
-## 🤝 参与贡献
-
-欢迎任何形式的贡献！如果你有新的功能点子、发现了Bug，或者有任何改进建议，请：
--   提交一个 [Issue](https://github.com/toki-plus/ai-video-workflow/issues) 进行讨论。
--   Fork 本仓库并提交 [Pull Request](https://github.com/toki-plus/ai-video-workflow/pulls)。
-
-如果这个项目对你有帮助，请不吝点亮一颗 ⭐！
-
-## 📜 开源协议
-
-本项目基于 MIT 协议开源。详情请见 [LICENSE](LICENSE) 文件。
-
-
-
+See [LICENSE](./LICENSE).
